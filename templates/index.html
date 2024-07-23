@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentiment Analysis</title>
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #f39c12;
+            --background-color: #f4f4f4;
+            --text-color: #333;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+        }
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        textarea {
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+            min-height: 100px;
+        }
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #357abd;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+        }
+        .positive {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .negative {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .neutral {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        #confidence {
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Sentiment Analysis</h1>
+        <form id="sentiment-form">
+            <textarea id="review" name="review" placeholder="Enter your review here..." required></textarea>
+            <button type="submit">Analyze Sentiment</button>
+        </form>
+        <div id="result"></div>
+        <div id="confidence"></div>
+    </div>
+
+    <script>
+        document.getElementById('sentiment-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const review = document.getElementById('review').value;
+            fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'review=' + encodeURIComponent(review)
+            })
+            .then(response => response.json())
+            .then(data => {
+                const resultDiv = document.getElementById('result');
+                const confidenceDiv = document.getElementById('confidence');
+                resultDiv.textContent = `Sentiment: ${data.sentiment}`;
+                resultDiv.className = data.sentiment.toLowerCase();
+                resultDiv.style.display = 'block';
+                confidenceDiv.textContent = `Confidence: ${(data.confidence * 100).toFixed(2)}%`;
+                confidenceDiv.style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>
